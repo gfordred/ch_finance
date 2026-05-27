@@ -1,1 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SA Money Lab | Tax + Home Loan Teacher</title>
+<style>
+  :root{
+    --bg:#030711; --bg2:#07111f; --panel:#0b1627; --panel2:#101f36; --panel3:#132944;
+    --text:#edf7ff; --muted:#9eb3cc; --soft:#c9d8eb; --line:rgba(255,255,255,.12);
+    --cyan:#42f5d7; --blue:#78a8ff; --gold:#ffd166; --red:#ff647c; --green:#2ee59d; --purple:#b88cff;
+    --shadow:0 28px 90px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:
+    radial-gradient(circle at 16% -10%,rgba(66,245,215,.24),transparent 30%),
+    radial-gradient(circle at 82% 8%,rgba(120,168,255,.21),transparent 28%),
+    radial-gradient(circle at 50% 100%,rgba(184,140,255,.10),transparent 35%),linear-gradient(180deg,#050a14,#02050b 70%);line-height:1.45;}
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 85%)}
+  header,main{max-width:1240px;margin:auto;padding:0 18px} header{padding-top:34px;padding-bottom:16px}
+  .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:24px;flex-wrap:wrap}.brand{display:flex;gap:12px;align-items:center;font-weight:950;letter-spacing:.04em;text-transform:uppercase;color:#dffff8}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--blue));box-shadow:0 0 35px rgba(66,245,215,.35)}
+  .nav{display:flex;gap:8px;flex-wrap:wrap}.nav a,.pill{border:1px solid var(--line);background:rgba(255,255,255,.055);color:#dbeafe;text-decoration:none;padding:9px 12px;border-radius:999px;font-weight:800;font-size:.88rem;backdrop-filter:blur(8px)}
+  .hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;align-items:stretch}@media(max-width:920px){.hero{grid-template-columns:1fr}}
+  h1{font-size:clamp(2.4rem,6vw,5.7rem);line-height:.88;margin:0 0 16px;letter-spacing:-.07em}.gradient{background:linear-gradient(90deg,#fff,var(--cyan),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}.lead{font-size:1.12rem;color:var(--soft);max-width:820px}.heroCard{background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.035));border:1px solid var(--line);border-radius:30px;padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}
+  .score{font-size:3rem;font-weight:1000;letter-spacing:-.06em}.subtle{color:var(--muted);font-size:.92rem}.spark{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple));margin:14px 0}
+  main{padding-bottom:70px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:16px}.card{grid-column:span 12;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.032));border:1px solid var(--line);border-radius:26px;padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(13px);position:relative;overflow:hidden}.card:before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.55}.half{grid-column:span 6}.third{grid-column:span 4}.two{grid-column:span 8}.quarter{grid-column:span 3}@media(max-width:980px){.half,.third,.two,.quarter{grid-column:span 12}}
+  h2{margin:0 0 10px;font-size:1.55rem;letter-spacing:-.03em} h3{margin:14px 0 8px;color:#e7fbff}.sectionLabel{color:var(--cyan);font-size:.78rem;font-weight:950;text-transform:uppercase;letter-spacing:.12em}.small{font-size:.92rem;color:var(--muted)} b{color:#f8fdff}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:720px){.row{grid-template-columns:1fr}}
+  label{display:flex;justify-content:space-between;gap:8px;align-items:end;font-weight:900;margin:13px 0 7px}.val{color:var(--cyan);font-variant-numeric:tabular-nums;font-size:.9rem}
+  input,select{width:100%;padding:12px 13px;border-radius:15px;border:1px solid var(--line);background:#071425;color:var(--text);font-size:1rem;outline:none} input:focus,select:focus{border-color:rgba(66,245,215,.7);box-shadow:0 0 0 4px rgba(66,245,215,.08)}
+  input[type=range]{padding:0;height:34px;accent-color:var(--cyan);background:transparent}.dual{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}@media(max-width:850px){.kpis{grid-template-columns:repeat(2,1fr)}}.kpi{background:linear-gradient(180deg,rgba(8,22,40,.96),rgba(8,18,32,.88));border:1px solid var(--line);border-radius:19px;padding:14px;min-height:96px}.big{font-size:clamp(1.35rem,2.4vw,2rem);font-weight:1000;letter-spacing:-.045em;font-variant-numeric:tabular-nums}.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}
+  .note{padding:13px 14px;border-radius:18px;background:rgba(66,245,215,.07);border:1px solid rgba(66,245,215,.24);color:#dffff8}.warn{background:rgba(255,209,102,.085);border-color:rgba(255,209,102,.28)}.dangerNote{background:rgba(255,100,124,.085);border-color:rgba(255,100,124,.28)}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem;overflow:hidden} th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:right} th:first-child,td:first-child{text-align:left} th{color:#dff;background:rgba(255,255,255,.035)} tr:hover td{background:rgba(255,255,255,.035)}
+  .bar{height:13px;background:#06111f;border-radius:999px;overflow:hidden;border:1px solid var(--line)}.fill{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--cyan),var(--blue));transition:width .25s}.fill.warnFill{background:linear-gradient(90deg,var(--gold),var(--red))}.meterGrid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.mini{display:flex;gap:8px;flex-wrap:wrap}.tag{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:#dce8f8;background:rgba(255,255,255,.055);font-weight:850}
+  details{border:1px solid var(--line);border-radius:18px;padding:13px;background:rgba(255,255,255,.04);margin-top:10px} summary{cursor:pointer;font-weight:950;color:#f2fbff}.callout{border-left:3px solid var(--cyan);padding-left:12px;color:var(--soft)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:850px){.tiles{grid-template-columns:1fr}}.tile{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:20px;padding:15px}.emoji{font-size:1.8rem}.quiz button{margin:5px 5px 0 0}.ghost{background:rgba(255,255,255,.06);color:#eaf7ff;border:1px solid var(--line)}.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#041019;border:0}.btn{border-radius:14px;font-weight:950;padding:10px 12px;cursor:pointer}
+  .splitviz{display:grid;grid-template-columns:1fr 1fr;gap:10px}.donut{height:180px;border-radius:50%;background:conic-gradient(var(--cyan) 0 20%,var(--gold) 20% 38%,var(--blue) 38% 100%);display:grid;place-items:center;margin:auto;max-width:180px}.donut div{width:112px;height:112px;border-radius:50%;background:#07111f;display:grid;place-items:center;text-align:center;font-weight:950}.footer{color:var(--muted);font-size:.84rem;border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
 
+
+
+  /* Bright, readable home-loan charts on the dark banking theme */
+  .chartGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  @media(max-width:980px){.chartGrid{grid-template-columns:1fr}}
+  .chartCard{
+    background:linear-gradient(180deg,rgba(13,31,55,.96),rgba(7,17,32,.96));
+    border:1px solid rgba(120,168,255,.28);
+    border-radius:24px;
+    padding:16px;
+    box-shadow:0 22px 65px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .chart{
+    width:100%;
+    height:300px;
+    display:block;
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 20% 15%,rgba(66,245,215,.16),transparent 25%),
+      radial-gradient(circle at 80% 5%,rgba(255,209,102,.12),transparent 26%),
+      linear-gradient(180deg,#10243f,#08172b);
+    border:1px solid rgba(255,255,255,.13);
+    overflow:visible;
+    padding:8px;
+  }
+  .gridline{stroke:rgba(255,255,255,.18);stroke-width:1;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
+  .axis{stroke:rgba(223,250,255,.72);stroke-width:1.5;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
+  .chartLabel{fill:#eefcff;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums;paint-order:stroke;stroke:#06111f;stroke-width:4px;stroke-linejoin:round}
+  .linePrincipal{fill:none;stroke:#42f5d7;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(66,245,215,.75));vector-effect:non-scaling-stroke}
+  .lineNoExtra{fill:none;stroke:#ff6b9a;stroke-width:4;stroke-dasharray:9 7;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 7px rgba(255,107,154,.7));vector-effect:non-scaling-stroke}
+  .barInterest{fill:#ffd166;filter:drop-shadow(0 0 5px rgba(255,209,102,.45))}
+  .barPrincipal{fill:#42f5d7;filter:drop-shadow(0 0 5px rgba(66,245,215,.45))}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 4px;color:#eaf7ff;font-weight:900;font-size:.9rem}
+  .legend span{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 9px}
+  .dot{width:11px;height:11px;border-radius:999px;display:inline-block;box-shadow:0 0 12px currentColor}.d-cyan{background:#42f5d7;color:#42f5d7}.d-gold{background:#ffd166;color:#ffd166}.d-ghost{background:#ff6b9a;color:#ff6b9a}
+  .treemap{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-top:14px;min-height:210px}
+  .treeTile{border-radius:22px;padding:16px;min-height:95px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 45px rgba(0,0,0,.28)}
+  .treeTile .name{font-weight:1000;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem}.treeTile .amount{font-size:1.35rem;font-weight:1000;letter-spacing:-.04em;color:#fff}.treeDeposit{background:linear-gradient(135deg,#2563eb,#78a8ff)}.treePrincipal{background:linear-gradient(135deg,#0891b2,#42f5d7);color:#03121a}.treeInterest{background:linear-gradient(135deg,#b45309,#ffd166);color:#160d02}.treeSaving{background:linear-gradient(135deg,#059669,#2ee59d);color:#02150d}
+
+  .lockScreen{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 10%,rgba(66,245,215,.25),transparent 32%),radial-gradient(circle at 80% 0%,rgba(120,168,255,.22),transparent 30%),linear-gradient(180deg,#030711,#01030a 82%);}
+  .lockBox{width:min(520px,100%);border:1px solid rgba(255,255,255,.16);border-radius:30px;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));box-shadow:0 34px 100px rgba(0,0,0,.65);backdrop-filter:blur(18px)}
+  .lockBox h1{font-size:clamp(2rem,7vw,4.2rem);line-height:.9;margin:10px 0 14px}.lockBox p{color:var(--soft)}
+  .lockActions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:16px}@media(max-width:520px){.lockActions{grid-template-columns:1fr}}
+  .lockError{min-height:22px;color:var(--red);font-weight:900;margin-top:10px}.blurredApp{filter:blur(8px);pointer-events:none;user-select:none;max-height:100vh;overflow:hidden}
+
+
+
+  /* v9: mobile/tablet learning layout improvements */
+  .formulaBox{background:linear-gradient(180deg,rgba(66,245,215,.09),rgba(120,168,255,.055));border:1px solid rgba(66,245,215,.22);border-radius:20px;padding:14px;margin-top:12px}
+  .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#eaffff;background:rgba(0,0,0,.22);padding:10px;border-radius:14px;overflow-x:auto;white-space:nowrap;font-size:.9rem}
+  .exampleGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .exampleCard{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:15px;min-height:150px}
+  .exampleCard .num{font-size:1.45rem;font-weight:1000;color:var(--cyan);letter-spacing:-.04em}
+  .ladder{display:grid;gap:9px;margin-top:12px}.ladderStep{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:18px;padding:12px}.ladderStep .badge{width:30px;height:30px;border-radius:11px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#041019;font-weight:1000;display:grid;place-items:center}
+  .mobileHint{display:none;color:#dffff8;background:rgba(66,245,215,.08);border:1px solid rgba(66,245,215,.22);border-radius:16px;padding:11px;margin:10px 0;font-size:.9rem}
+  @media(max-width:760px){
+    header,main{padding-left:12px;padding-right:12px}.topbar{position:sticky;top:0;z-index:20;background:rgba(3,7,17,.86);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:10px}.brand{font-size:.82rem}.logo{width:34px;height:34px;border-radius:12px}.nav{overflow-x:auto;flex-wrap:nowrap;width:100%;padding-bottom:4px}.nav a{white-space:nowrap;font-size:.78rem;padding:8px 10px}h1{font-size:clamp(2.05rem,13vw,3.4rem);line-height:.92}.lead{font-size:1rem}.heroCard,.card{border-radius:22px;padding:15px}.dual{grid-template-columns:1fr}.dual input[type=number]{font-size:1.05rem}.kpis{grid-template-columns:1fr}.kpi{min-height:auto}.big{font-size:1.55rem}.exampleGrid{grid-template-columns:1fr}.splitviz{grid-template-columns:1fr}.chart{height:235px}.chartCard{padding:12px;border-radius:20px}.treemap{grid-template-columns:1fr;min-height:auto}.treeTile{grid-column:span 1 !important;min-height:110px}table{display:block;overflow-x:auto;white-space:nowrap}.mobileHint{display:block}.timeline{grid-template-columns:1fr!important}.sectionLabel{font-size:.72rem}.pill{font-size:.76rem}
+  }
+  @media(min-width:761px) and (max-width:1100px){.exampleGrid{grid-template-columns:1fr 1fr}.quarter{grid-column:span 6}.chart{height:275px}.hero{grid-template-columns:1fr}.nav a{font-size:.82rem}}
+
+</style>
+</head>
+<body>
+<div class="lockScreen" id="lockScreen" aria-label="Password required">
+  <div class="lockBox">
+    <div class="brand"><div class="logo"></div><div>Carmen Money Lab</div></div>
+    <h1>Private planning page</h1>
+    <p>This personalised tax and home-loan dashboard is protected for Carmen. Enter the page password to view the tool.</p>
+    <label for="pagePassword" style="display:block;margin-top:16px">Password</label>
+    <div class="lockActions">
+      <input id="pagePassword" type="password" placeholder="Enter password" autocomplete="current-password" />
+      <button class="btn primary" onclick="unlockPage()">Unlock</button>
+    </div>
+    <div class="lockError" id="lockError"></div>
+    <p class="small">Note: this is a simple browser password gate for privacy, not bank-grade encryption.</p>
+  </div>
+</div>
+<div id="appShell" class="blurredApp">
+
+<header>
+  <div class="topbar"><div class="brand"><div class="logo"></div><div>Carmen Money Lab</div></div><nav class="nav"><a href="#carmen">Carmen plan</a><a href="#incomeTax">Income tax</a><a href="#cgt">CGT</a><a href="#bond">Home loan</a><a href="#academic">Examples</a><a href="#tables">Tables</a></nav></div>
+  <section class="hero">
+    <div class="heroCard"><div class="pill">🇿🇦 Built for first salary • first investment • first bond</div><h1>Tax and home loans, explained like a <span class="gradient">trading dashboard</span>.</h1><p class="lead">A reassuring, practical single-page money lesson for Carmen: an Emirates airhostess living and working from Dubai, planning to return to South Africa in December 2026 and apply for a home loan using her international salary plus SA investment income.</p><div class="mini"><span class="tag">PAYE</span><span class="tag">Marginal tax</span><span class="tag">CGT</span><span class="tag">183-day rule</span><span class="tag">Bond affordability</span></div></div>
+    <div class="heroCard carmen"><div class="sectionLabel">Carmen scenario dashboard</div><div class="score" id="moneyScore">72</div><div class="subtle">Confidence score based on the Dubai foreign-employment exemption, South African investment income, CGT drag, deposit size and home-loan affordability.</div><div class="spark"></div><p class="callout" id="heroInsight">Move the sliders to see your score change.</p></div>
+  </section>
+</header>
+<main>
+  <div class="mobileHint">Tip on phone: use sliders first, then open the examples below each module. Tables scroll sideways where needed.</div>
+  <section class="grid" id="carmen">
+    <div class="card two">
+      <div class="sectionLabel">Personal scenario</div><h2>Carmen’s Dubai-to-SA return plan</h2>
+      <p class="lead" style="font-size:1.02rem">Carmen earns roughly <b>R90,000 per month</b> from Emirates in Dubai and has about <b>R40,000 per month</b> from South African investments in a medical-rep company. She intends to return to South Africa in <b>December 2026</b>, live in the property, and use the SA investment income to help cover living costs and the bond.</p>
+      <div class="kpis"><div class="kpi"><div class="small">Emirates salary</div><div class="big">±R90k pm</div></div><div class="kpi"><div class="small">SA investment income</div><div class="big">±R40k pm</div></div><div class="kpi"><div class="small">Property target</div><div class="big">±R2.5m</div></div><div class="kpi"><div class="small">Deposit case</div><div class="big">10%</div></div></div>
+      <div class="note warn" style="margin-top:12px"><b>Calm framing:</b> this is not scary if it is managed properly. The key is to separate three questions: tax residence and exemptions, reliable bank-recognised income for affordability, and bond stress testing after she returns to South Africa.</div>
+      <div class="timeline"><div class="step"><b>1. Now</b><br><span class="small">Collect payslips, Emirates contract, bank statements, UAE residence proof and SA investment-income evidence.</span></div><div class="step"><b>2. Before return</b><br><span class="small">Track days outside SA and continuous absence for the 183/60-day foreign-employment exemption test.</span></div><div class="step"><b>3. Bond application</b><br><span class="small">Show stable foreign income plus SA investment income; stress test the bond at higher rates.</span></div><div class="step"><b>4. Dec 2026 onward</b><br><span class="small">Re-check tax residence, PAYE/provisional tax, and whether income mix changes once living in SA.</span></div></div>
+    </div>
+    <aside class="card third"><div class="sectionLabel">Professional note</div><h2>What she should understand</h2><p class="callout">Her Emirates salary may qualify for the foreign employment income exemption while she meets the full-days-outside-SA rules, but SA-source investment income remains important and may still be taxable depending on its exact nature.</p><p class="small">This page is an education tool for better conversations with a tax practitioner and bond originator. It intentionally teaches thresholds, caps, marginal tax and affordability rather than pretending tax is one magic number.</p></aside>
+  </section>
+
+  <section class="grid" id="incomeTax">
+    <div class="card two">
+      <div class="sectionLabel">Module 1</div><h2>Income tax: what happens to your salary?</h2><p class="small">Educational estimate using SARS individual income tax brackets for the 2027 year of assessment. Real tax can differ because of payroll benefits, retirement limits, medical credits, travel allowances and other rules.</p>
+      <div class="row">
+        <div><label>Annual income excluding SA interest <span class="val" id="incomeVal"></span></label><div class="dual"><input id="incomeRange" type="range" min="0" max="3000000" step="5000" value="1560000"><input id="income" type="number" value="1560000" min="0" step="1000"></div></div>
+        <div><label>Retirement / RA contribution <span class="val" id="retirementVal"></span></label><div class="dual"><input id="retirementRange" type="range" min="0" max="350000" step="1000" value="0"><input id="retirement" type="number" value="0" min="0" step="500"></div></div>
+      </div>
+      <div class="row">
+        <div><label>Medical aid members <span class="val" id="medicalVal"></span></label><div class="dual"><input id="medicalRange" type="range" min="0" max="8" step="1" value="1"><input id="medical" type="number" value="1" min="0" step="1"></div></div>
+        <div><label>SA interest income <span class="val" id="interestIncomeVal"></span></label><div class="dual"><input id="interestIncomeRange" type="range" min="0" max="250000" step="1000" value="0"><input id="interestIncome" type="number" value="0" min="0" step="500"></div></div>
+      </div>
+      <div class="row">
+        <div><label>Age group</label><select id="age"><option value="u65">Under 65</option><option value="65">65 to 74</option><option value="75">75+</option></select></div><div class="note" id="interestNote"></div>
+      </div>
+      <details open><summary>Foreign employment income exemption / 183-day rule</summary><p class="small">For SA tax residents earning qualifying foreign employment remuneration: if you are outside SA for more than 183 full days in any 12-month period, including a continuous period of more than 60 full days, the first R1.25m may be exempt. This is a powerful lesson, not a substitute for tax advice.</p>
+        <div class="row">
+          <div><label>Foreign employment income included above <span class="val" id="foreignIncomeVal"></span></label><div class="dual"><input id="foreignIncomeRange" type="range" min="0" max="2500000" step="5000" value="1080000"><input id="foreignIncome" type="number" value="1080000" min="0" step="1000"></div></div>
+          <div><label>Days outside SA in 12 months <span class="val" id="daysOutVal"></span></label><div class="dual"><input id="daysOutRange" type="range" min="0" max="366" step="1" value="300"><input id="daysOut" type="number" value="300" min="0" max="366" step="1"></div></div>
+        </div>
+        <div class="row">
+          <div><label>Longest continuous full days outside SA <span class="val" id="continuousDaysVal"></span></label><div class="dual"><input id="continuousDaysRange" type="range" min="0" max="366" step="1" value="90"><input id="continuousDays" type="number" value="90" min="0" max="366" step="1"></div></div>
+          <div><label>Type of income</label><select id="isEmployee"><option value="yes">Qualifying employee remuneration</option><option value="no">Contractor / business / unsure</option></select></div>
+        </div><div class="note" id="foreignNote" style="margin-top:10px"></div>
+      </details>
+      <div class="kpis"><div class="kpi"><div class="small">Foreign exemption used</div><div class="big" id="foreignExemptOut">R0</div></div><div class="kpi"><div class="small">Taxable SA interest</div><div class="big" id="taxableInterestOut">R0</div></div><div class="kpi"><div class="small">Taxable income</div><div class="big" id="taxableOut">R0</div></div><div class="kpi"><div class="small">Annual tax estimate</div><div class="big" id="taxOut">R0</div></div><div class="kpi"><div class="small">Take-home / month</div><div class="big" id="takeHomeOut">R0</div></div></div>
+      <h3>Marginal tax rate meter</h3><div class="meterGrid"><div class="bar"><div class="fill" id="taxBar"></div></div><p class="small" id="bracketText"></p></div>
+    </div>
+    <aside class="card third"><div class="sectionLabel">Academic but simple</div><h2>What marginal tax rate means</h2><p class="note warn"><b>Important:</b> if your marginal rate is 31%, SARS does not take 31% of your whole salary. Only the slice of income inside that bracket is taxed at 31%.</p><div class="tiles" style="grid-template-columns:1fr;margin-top:12px"><div class="tile"><div class="emoji">🍕</div><h3>Pizza-slice idea</h3><p class="small">Your income is sliced into brackets. Each slice has its own rate. Add the tax on all slices, then subtract rebates.</p></div><div class="tile"><div class="emoji">🚪</div><h3>Next-rand idea</h3><p class="small">Marginal rate answers: “What tax do I pay on the next R1 of taxable income?”</p></div><div class="tile"><div class="emoji">🧾</div><h3>PAYE idea</h3><p class="small">PAYE is tax collected from salary during the year. Filing reconciles the estimate to your actual position.</p></div><div class="formulaBox"><h3>Worked mini-example</h3><p class="small">If taxable income rises by R10,000 while Carmen is in a 31% marginal bracket, the extra tax is about R3,100. Her whole income is not repriced; only the extra slice is taxed at 31%.</p><div class="formula">Extra tax ≈ extra taxable income × marginal rate</div></div></div></aside>
+  </section>
+
+  <section class="grid" id="cgt">
+    <div class="card half"><div class="sectionLabel">Module 2</div><h2>Capital gains tax: profit is not all tax</h2><p class="small">For individuals, this demo applies the annual CGT exclusion first, then includes 40% of the remaining gain in taxable income. For Carmen, this matters if she sells investments before/after returning, or eventually sells a property or shares.</p>
+      <div class="row"><div><label>Sell price / market value <span class="val" id="sellVal"></span></label><div class="dual"><input id="sellRange" type="range" min="0" max="5000000" step="10000" value="300000"><input id="sell" type="number" value="300000" min="0" step="1000"></div></div><div><label>Base cost / purchase price <span class="val" id="baseVal"></span></label><div class="dual"><input id="baseRange" type="range" min="0" max="5000000" step="10000" value="200000"><input id="base" type="number" value="200000" min="0" step="1000"></div></div></div>
+      <div class="row"><div><label>Allowed costs added to base cost <span class="val" id="costsVal"></span></label><div class="dual"><input id="costsRange" type="range" min="0" max="500000" step="1000" value="0"><input id="costs" type="number" value="0" min="0" step="500"></div></div><div><label>Marginal tax rate</label><select id="marginal"><option value="0.18">18%</option><option value="0.26">26%</option><option value="0.31">31%</option><option value="0.36">36%</option><option value="0.39">39%</option><option value="0.41">41%</option><option value="0.45" selected>45%</option></select></div></div>
+      <div class="kpis"><div class="kpi"><div class="small">Capital gain</div><div class="big" id="gainOut">R0</div></div><div class="kpi"><div class="small">Taxable inclusion</div><div class="big" id="includedOut">R0</div></div><div class="kpi"><div class="small">CGT estimate</div><div class="big" id="cgtOut">R0</div></div><div class="kpi"><div class="small">Effective rate</div><div class="big" id="effOut">0%</div></div></div>
+    </div>
+    <div class="card half"><div class="sectionLabel">Visual intuition</div><h2>Where the gain goes</h2><div class="splitviz"><div><div class="donut" id="gainDonut"><div id="donutText">CGT<br>view</div></div></div><div><p class="callout" id="cgtStory">A gain first gets reduced by the annual exclusion. Then only 40% enters taxable income.</p><div class="note"><b>Threshold logic:</b> the first R50,000 annual capital gain/loss exclusion is ignored, then only 40% of the balance is included. At a 45% marginal rate, the simple maximum individual CGT drag is about 18% before special exclusions such as the primary-residence exclusion.</div></div></div>
+    </div>
+  </section>
+
+  <section class="grid" id="bond">
+    <div class="card two"><div class="sectionLabel">Module 3</div><h2>Home loan: interest rate risk in plain English</h2><p class="small">A home loan is a long-term interest-rate exposure. Carmen’s base case is a R2.5m property, 10% deposit and a R2.25m bond. Because she plans to live in the house, the calculator focuses on monthly affordability, rate shocks and cash-buffer discipline.</p>
+      <div class="row"><div><label>Property price <span class="val" id="priceVal"></span></label><div class="dual"><input id="priceRange" type="range" min="200000" max="6000000" step="10000" value="2500000"><input id="price" type="number" value="2500000" step="10000"></div></div><div><label>Deposit <span class="val" id="depositVal"></span></label><div class="dual"><input id="depositRange" type="range" min="0" max="2000000" step="5000" value="250000"><input id="deposit" type="number" value="250000" step="5000"></div></div></div>
+      <div class="row"><div><label>Interest rate % <span class="val" id="rateVal"></span></label><div class="dual"><input id="rateRange" type="range" min="6" max="18" step="0.05" value="11.15"><input id="rate" type="number" value="11.15" step="0.05"></div></div><div><label>Loan term years <span class="val" id="yearsVal"></span></label><div class="dual"><input id="yearsRange" type="range" min="5" max="30" step="1" value="20"><input id="years" type="number" value="20" step="1"></div></div></div>
+      <div class="row"><div><label>Extra monthly payment <span class="val" id="extraVal"></span></label><div class="dual"><input id="extraRange" type="range" min="0" max="30000" step="100" value="0"><input id="extra" type="number" value="0" step="100"></div></div><div><label>Gross monthly income <span class="val" id="grossMonthlyVal"></span></label><div class="dual"><input id="grossMonthlyRange" type="range" min="5000" max="250000" step="1000" value="130000"><input id="grossMonthly" type="number" value="130000" step="1000"></div></div></div>
+      <div class="kpis"><div class="kpi"><div class="small">Loan amount</div><div class="big" id="loanOut">R0</div></div><div class="kpi"><div class="small">Required payment</div><div class="big" id="payOut">R0</div></div><div class="kpi"><div class="small">Total interest</div><div class="big" id="interestOut">R0</div></div><div class="kpi"><div class="small">Paid off in</div><div class="big" id="termOut">0y</div></div></div>
+      <div class="row" style="margin-top:12px"><div><h3>Affordability pressure</h3><div class="bar"><div class="fill" id="affBar"></div></div><p class="small" id="affText"></p></div><div><h3>Rate shock: +2%</h3><div class="bar"><div class="fill warnFill" id="shockBar"></div></div><p class="small" id="shockText"></p></div></div>
+      <div class="kpis"><div class="kpi"><div class="small">Effective debt cost</div><div class="big" id="effDebtOut">0.0%</div></div><div class="kpi"><div class="small">Interest saved by extra</div><div class="big good" id="savedOut">R0</div></div><div class="kpi"><div class="small">Time saved</div><div class="big" id="timeSavedOut">0m</div></div><div class="kpi"><div class="small">Loan-to-value</div><div class="big" id="ltvOut">0%</div></div></div>
+      <div class="chartCard"><h3>Amortisation curve: balance falls slowly at first, then faster</h3><svg class="chart" id="balanceChart" viewBox="0 0 760 260" preserveAspectRatio="none"></svg><div class="legend"><span><i class="dot d-cyan"></i>With extra payments</span><span><i class="dot d-ghost"></i>Required-payment path</span></div><p class="small" id="balanceExplain"></p></div>
+      <div class="chartCard"><h3>Annual payment split: early years are mostly interest</h3><svg class="chart" id="splitChart" viewBox="0 0 760 260" preserveAspectRatio="none"></svg><div class="legend"><span><i class="dot d-gold"></i>Interest</span><span><i class="dot d-cyan"></i>Capital repaid</span></div><p class="small">This is the core home-loan lesson: the bank does not charge interest once-off. Interest is recalculated each month on the remaining balance. Extra payments work because they reduce that balance sooner.</p></div>
+    </div>
+    <aside class="card third"><div class="sectionLabel">Loan lessons</div><h2>The bond survival kit</h2><div class="tiles" style="grid-template-columns:1fr"><div class="tile"><div class="emoji">🛡️</div><h3>Deposit and LTV</h3><p class="small">A higher deposit lowers the loan-to-value ratio. That usually improves credit comfort because Carmen has more equity and less debt at risk.</p></div><div class="tile"><div class="emoji">⚡</div><h3>Extra payments</h3><p class="small">Extra capital payments are powerful because they attack the balance before future interest is calculated.</p></div><div class="tile"><div class="emoji">🌪️</div><h3>Rate shock</h3><p class="small">A bond is a floating-rate risk for many South Africans. Always test a higher interest rate and a lower income month.</p></div><div class="tile"><div class="emoji">📊</div><h3>Effective cost of debt</h3><p class="small">The true cost is not just the rate. It is the total interest paid, timing of payments, term length, and whether extra cash is used to shorten the debt.</p></div></div></aside>
+    <div class="card half"><div class="sectionLabel">Visual cash map</div><h2>Where Carmen’s property money goes</h2><div class="treemap" id="loanTree"></div><p class="small" id="treeExplain"></p></div>
+    <div class="card half"><div class="sectionLabel">Scenario table</div><h2>Extra-payment sensitivity</h2><table class="scenarioTable" id="scenarioTable"></table><div class="note warn"><b>Teaching point:</b> the earliest extra rand usually has the highest impact because it prevents interest from compounding on that rand for many future months.</div></div>
+  </section>
+
+
+  <section class="grid" id="academic">
+    <div class="card two">
+      <div class="sectionLabel">Academic explanations</div><h2>Three formulas Carmen should really understand</h2>
+      <p class="small">These are deliberately simple but academically correct mental models. They help Carmen avoid the two big mistakes young professionals make: confusing marginal tax with average tax, and judging a home loan only by the monthly instalment.</p>
+      <div class="exampleGrid">
+        <div class="exampleCard"><div class="num">1</div><h3>Taxable income bridge</h3><p class="small">Start with income, remove allowed exemptions/deductions, add taxable interest and gains, then apply the SARS tax table and rebates.</p><div class="formula">Taxable income = income + taxable interest − deductions − exemptions</div></div>
+        <div class="exampleCard"><div class="num">2</div><h3>CGT bridge</h3><p class="small">Capital gains tax is not tax on the full sale proceeds. It starts with profit, applies the annual exclusion, and includes only 40% for individuals.</p><div class="formula">Taxable CGT inclusion = max(gain − R50,000, 0) × 40%</div></div>
+        <div class="exampleCard"><div class="num">3</div><h3>Bond cost bridge</h3><p class="small">A bond’s true cost is the sum of all future interest. Extra payments reduce principal, which reduces future interest months.</p><div class="formula">Monthly interest = opening balance × annual rate ÷ 12</div></div>
+      </div>
+    </div>
+    <aside class="card third"><div class="sectionLabel">Plain-English study guide</div><h2>How Carmen should read this app</h2><div class="ladder"><div class="ladderStep"><div class="badge">1</div><div><b>Residency and days</b><br><span class="small">Track where she physically is, because the foreign employment exemption depends on full days outside SA.</span></div></div><div class="ladderStep"><div class="badge">2</div><div><b>Income buckets</b><br><span class="small">Separate Emirates salary, SA investment income, interest, dividends, and capital gains. Each bucket can be taxed differently.</span></div></div><div class="ladderStep"><div class="badge">3</div><div><b>Bank affordability</b><br><span class="small">A bank wants sustainable income and a low enough repayment-to-income ratio, not just a high headline salary.</span></div></div><div class="ladderStep"><div class="badge">4</div><div><b>Cash buffer</b><br><span class="small">Before returning to SA, keep a buffer for transfer costs, furnishing, levies, rates, insurance and unexpected rate moves.</span></div></div></div></aside>
+    <div class="card half"><div class="sectionLabel">Worked tax example</div><h2>Example: Emirates salary and SA investment income</h2><p class="small">Assume R90k/month Emirates salary and R40k/month SA investment income. Annual gross income is about R1.56m. If the R1.08m foreign employment salary qualifies, up to R1.08m can be removed before the tax table, leaving the SA income and other taxable items to analyse.</p><div class="formulaBox"><div class="formula">R90,000 × 12 = R1,080,000 foreign employment income</div><div class="formula">R40,000 × 12 = R480,000 SA investment income</div><div class="formula">Potential foreign exemption = min(R1,080,000, R1,250,000)</div></div><p class="note warn"><b>Important:</b> the app does not decide whether the medical-rep-company amount is salary, dividend, interest, loan repayment, director fee or business income. Carmen should classify that income carefully because tax treatment changes.</p></div>
+    <div class="card half"><div class="sectionLabel">Worked bond example</div><h2>Example: why extra payments help</h2><p class="small">On a R2.25m bond, the first month’s interest at 11.15% is roughly R20.9k before capital reduction. This is why early payments feel slow. An extra payment reduces the balance immediately, so every future month starts from a smaller balance.</p><div class="formulaBox"><div class="formula">First-month interest ≈ R2,250,000 × 11.15% ÷ 12 ≈ R20,906</div><div class="formula">Capital repaid = monthly payment − monthly interest</div><div class="formula">Next balance = old balance − capital repaid − extra payment</div></div><p class="note"><b>Rule of thumb:</b> do not only ask “Can I afford this month?” Ask “Can I afford this after a 2% rate shock, while still saving and keeping emergency cash?”</p></div>
+  </section>
+
+  <section class="grid" id="tables">
+    <div class="card half"><div class="sectionLabel">Reference</div><h2>SA individual income tax table used</h2><table id="taxTable"></table></div>
+    <div class="card half"><div class="sectionLabel">Thresholds and caps</div><h2>Key SARS thresholds to remember</h2><table><tr><th>Item</th><th>Current teaching assumption</th><th>Why it matters</th></tr><tr><td>Income-tax threshold under 65</td><td>R99,000</td><td>Below this, normal rebates can reduce income tax to nil.</td></tr><tr><td>Interest exemption under 65</td><td>R23,800</td><td>Only SA interest above this annual amount is added to taxable income.</td></tr><tr><td>Foreign employment exemption</td><td>First R1.25m</td><td>Only if the 183 full days and 60 continuous full days tests are met.</td></tr><tr><td>CGT annual exclusion</td><td>R50,000</td><td>The first slice of annual capital gain/loss is excluded.</td></tr><tr><td>Primary residence exclusion</td><td>Up to R3m gain/loss</td><td>Relevant if she later sells the home she lives in.</td></tr></table></div>
+    <div class="card half"><div class="sectionLabel">Interactive quiz</div><h2>Quick brain check</h2><div class="quiz"><p id="quizQ" class="note warn">If you move from the 26% bracket into the 31% bracket, does all your income suddenly get taxed at 31%?</p><button class="btn ghost" onclick="quiz(false)">Yes, all of it</button><button class="btn primary" onclick="quiz(true)">No, only the next slice</button><p class="small" id="quizA"></p></div><details open><summary>Assumptions and limitations</summary><p class="small">This page excludes UIF, transfer duty, bond registration fees, municipal costs, tax-free savings account rules, detailed provisional-tax timing, exchange-control paperwork, retirement contribution caps and detailed medical expense rules. Carmen should use it to prepare better questions for a tax practitioner, bond originator and bank credit assessor.</p></details></div>
+  </section>
+</main>
+</div>
+<script>
+const PAGE_PASSWORD = 'carmen020610';
+function unlockPage(){
+  const input=document.getElementById('pagePassword');
+  const err=document.getElementById('lockError');
+  if(input && input.value === PAGE_PASSWORD){
+    sessionStorage.setItem('carmenMoneyLabUnlocked','yes');
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('appShell').classList.remove('blurredApp');
+  }else{
+    err.textContent='Incorrect password. Please try again.';
+    input.focus();
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const input=document.getElementById('pagePassword');
+  if(sessionStorage.getItem('carmenMoneyLabUnlocked')==='yes') unlockPage();
+  if(input) input.addEventListener('keydown',e=>{if(e.key==='Enter') unlockPage();});
+});
+
+const fmt = n => new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR',maximumFractionDigits:0}).format(isFinite(n)?n:0);
+const pct = n => (isFinite(n)?n:0).toFixed(1)+'%';
+const brackets=[
+  {min:0,max:245100,base:0,rate:.18,over:0,label:'18%'},{min:245100,max:383100,base:44118,rate:.26,over:245100,label:'26%'},{min:383100,max:530200,base:79998,rate:.31,over:383100,label:'31%'},{min:530200,max:695800,base:125599,rate:.36,over:530200,label:'36%'},{min:695800,max:887000,base:185215,rate:.39,over:695800,label:'39%'},{min:887000,max:1878600,base:259783,rate:.41,over:887000,label:'41%'},{min:1878600,max:Infinity,base:666339,rate:.45,over:1878600,label:'45%'}
+];
+const pairs=['income','retirement','medical','interestIncome','foreignIncome','daysOut','continuousDays','sell','base','costs','price','deposit','rate','years','extra','grossMonthly'];
+function linkPair(id){const a=document.getElementById(id), r=document.getElementById(id+'Range'), v=document.getElementById(id+'Val'); if(!a||!r)return; const syncFromInput=()=>{r.value=Math.min(+r.max,Math.max(+r.min,+a.value||0)); updateAll()}; const syncFromRange=()=>{a.value=r.value; updateAll()}; a.addEventListener('input',syncFromInput); r.addEventListener('input',syncFromRange);}
+pairs.forEach(linkPair);
+function setVal(id,txt){const e=document.getElementById(id+'Val'); if(e)e.textContent=txt;}
+function rawTax(x){if(x<=0)return 0; let b=brackets.find(b=>x>b.min && x<=b.max)||brackets[0]; return b.base+(x-b.over)*b.rate}
+function rebate(age){return age==='75'?17820+9765+3249:age==='65'?17820+9765:17820}
+function calcTax(){let inc=+income.value||0, ret=+retirement.value||0, med=+medical.value||0, intInc=Math.max(0,+interestIncome.value||0), fIncome=Math.max(0,+foreignIncome.value||0), days=+daysOut.value||0, continuous=+continuousDays.value||0; let interestExempt=age.value==='u65'?23800:34500, taxableInterest=Math.max(0,intInc-interestExempt); let qualifies=isEmployee.value==='yes'&&days>183&&continuous>60; let foreignExempt=qualifies?Math.min(fIncome,1250000):0; let taxable=Math.max(0,inc+taxableInterest-ret-foreignExempt); let before=rawTax(taxable); let medCredit=med>0?(364+Math.max(0,med-1)*246)*12:0; let tax=Math.max(0,before-rebate(age.value)-medCredit); let b=brackets.find(b=>taxable>b.min&&taxable<=b.max)||brackets[0]; foreignExemptOut.textContent=fmt(foreignExempt); taxableInterestOut.textContent=fmt(taxableInterest); taxableOut.textContent=fmt(taxable); taxOut.textContent=fmt(tax); takeHomeOut.textContent=fmt((inc+intInc-ret-tax)/12); interestNote.innerHTML=`<b>Interest threshold:</b> ${fmt(Math.min(intInc,interestExempt))} of SA interest is exempt; ${fmt(taxableInterest)} is taxable.`; taxBar.style.width=Math.min(100,taxable/1878600*100)+'%'; bracketText.innerHTML=`Your marginal bracket is around <b>${b.label}</b>. Your average tax rate is <b>${pct(tax/Math.max(1,inc+intInc)*100)}</b>. Carmen lesson: marginal rate is the tax on the next rand; average rate is total tax divided by total income.`; foreignNote.className='note '+(qualifies?'':'dangerNote'); foreignNote.innerHTML=qualifies?`<b class="good">Exemption applied:</b> ${fmt(foreignExempt)} of qualifying foreign employment income is removed before tax. Carmen’s R1.08m Emirates salary is below the R1.25m cap in this base case.`:`<b class="bad">No exemption applied:</b> needs qualifying employment remuneration, more than 183 full days outside SA and more than 60 continuous full days outside SA.`; return {tax,inc:inc+intInc,taxable,foreignExempt,b}}
+function calcCGT(){let gain=Math.max(0,(+sell.value||0)-(+base.value||0)-(+costs.value||0)); let net=Math.max(0,gain-50000); let included=net*.40; let tax=included*(+marginal.value||0); gainOut.textContent=fmt(gain); includedOut.textContent=fmt(included); cgtOut.textContent=fmt(tax); effOut.textContent=gain?pct(tax/gain*100):'0.0%'; let taxDeg=gain?Math.min(100,tax/gain*100):0; gainDonut.style.background=`conic-gradient(var(--red) 0 ${taxDeg}%, var(--cyan) ${taxDeg}% 100%)`; donutText.innerHTML=`CGT<br>${gain?pct(tax/gain*100):'0.0%'}`; cgtStory.innerHTML=`On a gain of <b>${fmt(gain)}</b>, the estimated CGT is <b>${fmt(tax)}</b>. The annual exclusion and 40% inclusion rate are why the tax is much lower than the full gain.`; return {gain,tax}}
+function payment(P,annual,months){let r=annual/100/12; return r===0?P/months:P*r/(1-Math.pow(1+r,-months))}
+function amortise(loan,rate,months,extra){
+  const req=payment(loan,rate,months); let bal=loan,totalInt=0,m=0,rows=[],annual=[];
+  while(bal>1 && m<1200){
+    const interest=bal*(rate/100/12); let principal=Math.max(0,Math.min(bal,req+extra-interest));
+    if(principal<=0){break}
+    totalInt+=interest; bal-=principal; m++;
+    rows.push({m,bal,interest,principal,totalPaid:req+extra});
+    const y=Math.ceil(m/12)-1; if(!annual[y]) annual[y]={year:y+1,interest:0,principal:0,endBal:bal};
+    annual[y].interest+=interest; annual[y].principal+=principal; annual[y].endBal=bal;
+  }
+  return {req,totalInt,months:m,rows,annual,finalBal:bal};
+}
+function fmtTerm(m){return m>=1200?'Never':`${Math.floor(m/12)}y ${m%12}m`}
+function drawBalanceChart(sim,base,loan){
+  const svg=document.getElementById('balanceChart'); if(!svg)return; const W=760,H=260,L=50,R=18,T=18,B=34;
+  const maxM=Math.max(base.months,sim.months,1), maxY=Math.max(loan,1);
+  const x=m=>L+(m/maxM)*(W-L-R), y=v=>T+(1-v/maxY)*(H-T-B);
+  let grid=''; for(let i=0;i<=4;i++){let yy=T+i*(H-T-B)/4; grid+=`<line class="gridline" x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}"/>`;}
+  const path=arr=>'M '+x(0)+' '+y(loan)+' '+arr.map(p=>'L '+x(p.m)+' '+y(p.bal)).join(' ');
+  svg.innerHTML=`${grid}<line class="axis" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/><path class="lineNoExtra" d="${path(base.rows)}"/><path class="linePrincipal" d="${path(sim.rows)}"/><text class="chartLabel" x="${L}" y="${H-8}">0</text><text class="chartLabel" x="${W-R-70}" y="${H-8}">${Math.round(maxM/12)} years</text><text class="chartLabel" x="${L+4}" y="${T+12}">${fmt(loan)}</text>`;
+}
+function drawSplitChart(sim){
+  const svg=document.getElementById('splitChart'); if(!svg)return; const W=760,H=260,L=48,R=16,T=18,B=34;
+  const data=sim.annual.slice(0,30), n=Math.max(data.length,1), max=Math.max(...data.map(d=>d.interest+d.principal),1);
+  const bw=(W-L-R)/n*.72, gap=(W-L-R)/n*.28; let out='';
+  for(let i=0;i<=4;i++){let yy=T+i*(H-T-B)/4; out+=`<line class="gridline" x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}"/>`;}
+  data.forEach((d,i)=>{let x=L+i*(bw+gap)+gap/2; let hI=d.interest/max*(H-T-B), hP=d.principal/max*(H-T-B); let base=H-B; out+=`<rect class="barInterest" x="${x}" y="${base-hI}" width="${bw}" height="${hI}" rx="3"/><rect class="barPrincipal" x="${x}" y="${base-hI-hP}" width="${bw}" height="${hP}" rx="3"/>`; if((i+1)%5===0||i===0) out+=`<text class="chartLabel" x="${x}" y="${H-8}">Y${i+1}</text>`;});
+  svg.innerHTML=`${out}<line class="axis" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/><text class="chartLabel" x="${L+4}" y="${T+12}">${fmt(max)}</text>`;
+}
+function renderTree(loan,deposit,totalInt,saved){
+  const total=Math.max(1,loan+deposit+totalInt); const pctCol=v=>Math.max(2,Math.round(v/total*12));
+  const tiles=[['Deposit',deposit,'treeDeposit'],['Bond principal',loan,'treePrincipal'],['Interest cost',totalInt,'treeInterest'],['Interest saved',Math.max(0,saved),'treeSaving']];
+  loanTree.innerHTML=tiles.map(([name,val,cls])=>`<div class="treeTile ${cls}" style="grid-column:span ${pctCol(val)}"><div class="name">${name}</div><div class="amount">${fmt(val)}</div><div class="small">${pct(val/total*100)} of shown stack</div></div>`).join('');
+}
+function renderScenarioTable(loan,rate,months){
+  const extras=[0,1000,2500,5000,10000,15000]; const base=amortise(loan,rate,months,0);
+  scenarioTable.innerHTML='<tr><th>Extra / month</th><th>Paid off in</th><th>Total interest</th><th>Interest saved</th></tr>'+extras.map(e=>{const s=amortise(loan,rate,months,e);return `<tr><td>${fmt(e)}</td><td>${fmtTerm(s.months)}</td><td>${fmt(s.totalInt)}</td><td class="good">${fmt(Math.max(0,base.totalInt-s.totalInt))}</td></tr>`}).join('');
+}
+function loanSim(){
+  let p=+price.value||0,d=Math.min(+deposit.value||0,p),loan=Math.max(0,p-d),r=+rate.value||0,n=(+years.value||0)*12,extra=+extra.value||0,gross=+grossMonthly.value||1;
+  const base=amortise(loan,r,n,0), sim=amortise(loan,r,n,extra); let pay=base.req, actual=pay+extra;
+  let shock=payment(loan,r+2,n), ratio=actual/gross, shockRatio=shock/gross, saved=Math.max(0,base.totalInt-sim.totalInt), timeSaved=Math.max(0,base.months-sim.months);
+  loanOut.textContent=fmt(loan); payOut.textContent=fmt(pay); interestOut.textContent=fmt(sim.totalInt); termOut.textContent=fmtTerm(sim.months);
+  effDebtOut.textContent=loan?pct(sim.totalInt/loan*100):'0.0%'; savedOut.textContent=fmt(saved); timeSavedOut.textContent=`${Math.floor(timeSaved/12)}y ${timeSaved%12}m`; ltvOut.textContent=p?pct(loan/p*100):'0.0%';
+  affBar.style.width=Math.min(100,ratio*220)+'%'; affBar.className='fill '+(ratio>.30?'warnFill':''); affText.innerHTML=ratio>.35?`<span class="bad">High pressure:</span> payment plus extras is ${pct(ratio*100)} of gross income.`:ratio>.30?`<span class="gold">Careful:</span> payment plus extras is ${pct(ratio*100)} of gross income.`:`<span class="good">Comfortable zone:</span> payment plus extras is ${pct(ratio*100)} of gross income.`;
+  shockBar.style.width=Math.min(100,shockRatio*220)+'%'; shockText.innerHTML=`If rates rise by 2%, required payment becomes <b>${fmt(shock)}</b> or <b>${pct(shockRatio*100)}</b> of gross income.`;
+  drawBalanceChart(sim,base,loan); drawSplitChart(sim); renderTree(loan,d,sim.totalInt,saved); renderScenarioTable(loan,r,n);
+  const first=sim.annual[0]||{interest:0,principal:0}; balanceExplain.innerHTML=`In year 1, about <b>${fmt(first.interest)}</b> goes to interest and <b>${fmt(first.principal)}</b> reduces the loan. With the selected extra payment, Carmen saves roughly <b class="good">${fmt(saved)}</b> of interest versus paying only the required amount.`;
+  treeExplain.innerHTML=`For Carmen’s base case, the debt is not only the <b>${fmt(loan)}</b> borrowed. The emotional and financial cost is the full stream of interest too. The practical goal is to keep the home affordable while using spare cash to buy down future interest.`;
+  return {ratio,shockRatio,depositRatio:d/Math.max(1,p)}
+}
+function drawTable(){taxTable.innerHTML='<tr><th>Taxable income band</th><th>Tax calculation</th><th>Marginal rate</th></tr>'+brackets.map(b=>`<tr><td>${fmt(b.min+1)} ${b.max===Infinity?'and above':'to '+fmt(b.max)}</td><td>${b.base?fmt(b.base)+' + ':''}${Math.round(b.rate*100)}% of amount above ${fmt(b.over)}</td><td>${Math.round(b.rate*100)}%</td></tr>`).join('')}
+function updateLabels(){setVal('income',fmt(+income.value||0));setVal('retirement',fmt(+retirement.value||0));setVal('medical',medical.value);setVal('interestIncome',fmt(+interestIncome.value||0));setVal('foreignIncome',fmt(+foreignIncome.value||0));setVal('daysOut',daysOut.value+' days');setVal('continuousDays',continuousDays.value+' days');setVal('sell',fmt(+sell.value||0));setVal('base',fmt(+base.value||0));setVal('costs',fmt(+costs.value||0));setVal('price',fmt(+price.value||0));setVal('deposit',fmt(+deposit.value||0));setVal('rate',(+rate.value||0).toFixed(2)+'%');setVal('years',years.value+' years');setVal('extra',fmt(+extra.value||0));setVal('grossMonthly',fmt(+grossMonthly.value||0));}
+function updateScore(t,c,l){let avgTax=t.tax/Math.max(1,t.inc), cgtDrag=c.gain?c.tax/c.gain:0; let score=100 - avgTax*85 - cgtDrag*40 - Math.max(0,l.ratio-.30)*120 + Math.min(.20,l.depositRatio)*80; score=Math.round(Math.max(0,Math.min(100,score))); moneyScore.textContent=score; heroInsight.innerHTML=score>78?'Strong setup: tax drag and bond pressure look manageable in this scenario.':score>55?'Middle zone: this works, but check rate shocks, emergency cash and total interest.':'Risky setup: the sliders suggest high pressure. Improve deposit, lower loan size, or test income stability.'}
+function updateAll(){updateLabels(); const t=calcTax(), c=calcCGT(), l=loanSim(); updateScore(t,c,l)}
+function quiz(ok){quizA.innerHTML=ok?'<b class="good">Correct.</b> Only the next slice of taxable income is taxed at the higher marginal rate.':'<b class="bad">Not quite.</b> SA tax is progressive: only income inside each bracket is taxed at that bracket rate.'}
+document.addEventListener('input',e=>{if(!pairs.some(id=>e.target.id===id||e.target.id===id+'Range')) updateAll()}); document.addEventListener('change',updateAll); drawTable(); updateAll();
+</script>
+
+<script>
+/* v7 FIX: robust home-loan engine. Avoids relying on browser-created globals for element IDs. */
+(function(){
+  const money = n => new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+  const percent = n => (Number.isFinite(n)?n:0).toFixed(1)+'%';
+  const el = id => document.getElementById(id);
+  const read = id => Number(el(id)?.value || 0);
+  const write = (id, value) => { const node = el(id); if(node) node.textContent = value; };
+  const setWidth = (id, value) => { const node = el(id); if(node) node.style.width = Math.max(0, Math.min(100, value)) + '%'; };
+  function monthlyPayment(principal, annualRate, months){
+    if(principal <= 0 || months <= 0) return 0;
+    const r = annualRate / 100 / 12;
+    if(Math.abs(r) < 1e-12) return principal / months;
+    return principal * r / (1 - Math.pow(1 + r, -months));
+  }
+  function amortiseLoan(principal, annualRate, months, extraPayment){
+    const required = monthlyPayment(principal, annualRate, months);
+    let balance = principal, totalInterest = 0, month = 0;
+    const rows = [], annual = [];
+    while(balance > 0.5 && month < 1200){
+      const interest = balance * annualRate / 100 / 12;
+      const totalPay = Math.max(required + extraPayment, interest + 1);
+      const capital = Math.min(balance, Math.max(0, totalPay - interest));
+      balance -= capital;
+      totalInterest += interest;
+      month += 1;
+      rows.push({m:month, bal:balance, interest, principal:capital});
+      const y = Math.ceil(month/12)-1;
+      if(!annual[y]) annual[y] = {year:y+1, interest:0, principal:0, endBal:balance};
+      annual[y].interest += interest;
+      annual[y].principal += capital;
+      annual[y].endBal = balance;
+    }
+    return {required, totalInterest, months:month, rows, annual, finalBalance:balance};
+  }
+  function term(m){ return m >= 1200 ? 'Never' : `${Math.floor(m/12)}y ${m%12}m`; }
+  function drawBalance(sim, base, loan){
+    const svg = el('balanceChart'); if(!svg) return;
+    const W=760,H=260,L=50,R=18,T=18,B=34;
+    const maxM=Math.max(base.months, sim.months, 1), maxY=Math.max(loan,1);
+    const x=m=>L+(m/maxM)*(W-L-R), y=v=>T+(1-v/maxY)*(H-T-B);
+    let grid='';
+    for(let i=0;i<=4;i++){ const yy=T+i*(H-T-B)/4; grid += `<line class="gridline" x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}"/>`; }
+    const path = arr => 'M '+x(0)+' '+y(loan)+' '+arr.map(p=>'L '+x(p.m)+' '+y(p.bal)).join(' ');
+    svg.innerHTML = `${grid}<line class="axis" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/><path class="lineNoExtra" d="${path(base.rows)}"/><path class="linePrincipal" d="${path(sim.rows)}"/><text class="chartLabel" x="${L}" y="${H-8}">0</text><text class="chartLabel" x="${W-R-78}" y="${H-8}">${Math.round(maxM/12)} years</text><text class="chartLabel" x="${L+4}" y="${T+12}">${money(loan)}</text>`;
+  }
+  function drawSplit(sim){
+    const svg = el('splitChart'); if(!svg) return;
+    const W=760,H=260,L=48,R=16,T=18,B=34;
+    const data = sim.annual.slice(0,30), n=Math.max(data.length,1);
+    const max = Math.max(...data.map(d=>d.interest+d.principal), 1);
+    const bw=(W-L-R)/n*.72, gap=(W-L-R)/n*.28;
+    let out='';
+    for(let i=0;i<=4;i++){ const yy=T+i*(H-T-B)/4; out += `<line class="gridline" x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}"/>`; }
+    data.forEach((d,i)=>{
+      const xx=L+i*(bw+gap)+gap/2, baseY=H-B;
+      const hI=d.interest/max*(H-T-B), hP=d.principal/max*(H-T-B);
+      out += `<rect class="barInterest" x="${xx}" y="${baseY-hI}" width="${bw}" height="${hI}" rx="3"/><rect class="barPrincipal" x="${xx}" y="${baseY-hI-hP}" width="${bw}" height="${hP}" rx="3"/>`;
+      if(i===0 || (i+1)%5===0) out += `<text class="chartLabel" x="${xx}" y="${H-8}">Y${i+1}</text>`;
+    });
+    svg.innerHTML = `${out}<line class="axis" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/><text class="chartLabel" x="${L+4}" y="${T+12}">${money(max)}</text>`;
+  }
+  function renderTree(loan, deposit, totalInterest, saved){
+    const tree = el('loanTree'); if(!tree) return;
+    const total = Math.max(1, loan + deposit + totalInterest + Math.max(0,saved));
+    const span = v => Math.max(2, Math.min(12, Math.round(v/total*12)));
+    const items = [['Deposit',deposit,'treeDeposit'],['Bond principal',loan,'treePrincipal'],['Interest cost',totalInterest,'treeInterest'],['Interest saved',Math.max(0,saved),'treeSaving']];
+    tree.innerHTML = items.map(([name,val,cls]) => `<div class="treeTile ${cls}" style="grid-column:span ${span(val)}"><div class="name">${name}</div><div class="amount">${money(val)}</div><div class="small">${percent(val/total*100)} of shown stack</div></div>`).join('');
+  }
+  function renderScenarios(loan, rate, months){
+    const table = el('scenarioTable'); if(!table) return;
+    const base = amortiseLoan(loan, rate, months, 0);
+    const extras = [0,1000,2500,5000,10000,15000];
+    table.innerHTML = '<tr><th>Extra / month</th><th>Paid off in</th><th>Total interest</th><th>Interest saved</th></tr>' + extras.map(x => {
+      const s = amortiseLoan(loan, rate, months, x);
+      return `<tr><td>${money(x)}</td><td>${term(s.months)}</td><td>${money(s.totalInterest)}</td><td class="good">${money(Math.max(0, base.totalInterest - s.totalInterest))}</td></tr>`;
+    }).join('');
+  }
+  function syncPair(id){
+    const input = el(id), range = el(id+'Range'), label = el(id+'Val');
+    if(!input || !range) return;
+    const updateLabel = () => {
+      const v = read(id);
+      if(!label) return;
+      if(['price','deposit','extra','grossMonthly'].includes(id)) label.textContent = money(v);
+      else if(id === 'rate') label.textContent = v.toFixed(2)+'%';
+      else if(id === 'years') label.textContent = `${v} years`;
+    };
+    const fromInput = () => { range.value = Math.max(Number(range.min), Math.min(Number(range.max), read(id))); updateLabel(); recalcHomeLoan(); };
+    const fromRange = () => { input.value = range.value; updateLabel(); recalcHomeLoan(); };
+    input.addEventListener('input', fromInput);
+    range.addEventListener('input', fromRange);
+    updateLabel();
+  }
+  function recalcHomeLoan(){
+    const price = read('price');
+    const deposit = Math.min(read('deposit'), price);
+    const loan = Math.max(0, price - deposit);
+    const rate = read('rate');
+    const months = Math.max(1, read('years') * 12);
+    const extra = Math.max(0, read('extra'));
+    const gross = Math.max(1, read('grossMonthly'));
+    const base = amortiseLoan(loan, rate, months, 0);
+    const sim = amortiseLoan(loan, rate, months, extra);
+    const required = base.required;
+    const actual = required + extra;
+    const shockPay = monthlyPayment(loan, rate + 2, months);
+    const ratio = actual / gross;
+    const shockRatio = shockPay / gross;
+    const saved = Math.max(0, base.totalInterest - sim.totalInterest);
+    const timeSaved = Math.max(0, base.months - sim.months);
+    write('loanOut', money(loan));
+    write('payOut', money(required));
+    write('interestOut', money(sim.totalInterest));
+    write('termOut', term(sim.months));
+    write('effDebtOut', loan ? percent(sim.totalInterest / loan * 100) : '0.0%');
+    write('savedOut', money(saved));
+    write('timeSavedOut', `${Math.floor(timeSaved/12)}y ${timeSaved%12}m`);
+    write('ltvOut', price ? percent(loan / price * 100) : '0.0%');
+    setWidth('affBar', ratio * 220);
+    const aff = el('affText');
+    if(aff) aff.innerHTML = ratio > .35 ? `<span class="bad">High pressure:</span> payment plus extras is ${percent(ratio*100)} of gross income.` : ratio > .30 ? `<span class="gold">Careful:</span> payment plus extras is ${percent(ratio*100)} of gross income.` : `<span class="good">Comfortable zone:</span> payment plus extras is ${percent(ratio*100)} of gross income.`;
+    setWidth('shockBar', shockRatio * 220);
+    const shock = el('shockText');
+    if(shock) shock.innerHTML = `If rates rise by 2%, required payment becomes <b>${money(shockPay)}</b> or <b>${percent(shockRatio*100)}</b> of gross income.`;
+    drawBalance(sim, base, loan);
+    drawSplit(sim);
+    renderTree(loan, deposit, sim.totalInterest, saved);
+    renderScenarios(loan, rate, months);
+    const first = sim.annual[0] || {interest:0, principal:0};
+    const balExplain = el('balanceExplain');
+    if(balExplain) balExplain.innerHTML = `In year 1, about <b>${money(first.interest)}</b> goes to interest and <b>${money(first.principal)}</b> reduces the loan. This shows why home loans feel slow at first: early instalments are mostly interest.`;
+    const treeExplain = el('treeExplain');
+    if(treeExplain) treeExplain.innerHTML = `Carmen’s shown debt stack includes <b>${money(loan)}</b> borrowed plus the interest stream. The practical goal is not to fear debt, but to control rate shocks, keep a cash buffer, and use spare cash to reduce future interest.`;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    ['price','deposit','rate','years','extra','grossMonthly'].forEach(syncPair);
+    recalcHomeLoan();
+  });
+  if(document.readyState !== 'loading'){
+    ['price','deposit','rate','years','extra','grossMonthly'].forEach(syncPair);
+    recalcHomeLoan();
+  }
+})();
+</script>
+
+</body>
+</html>
