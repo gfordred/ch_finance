@@ -95,6 +95,37 @@
   }
   @media(min-width:761px) and (max-width:1100px){.exampleGrid{grid-template-columns:1fr 1fr}.quarter{grid-column:span 6}.chart{height:275px}.hero{grid-template-columns:1fr}.nav a{font-size:.82rem}}
 
+
+
+  /* v10 layout fixes: wider academic formula area + less squashing */
+  *{box-sizing:border-box} .card,.tile,.exampleCard,.chartCard,.kpi{min-width:0} p,h1,h2,h3,.small,.note,.callout{overflow-wrap:anywhere}
+  @media(min-width:1101px){
+    #academic .card.two{grid-column:span 12;}
+    #academic aside.card.third{grid-column:span 12;}
+    #academic .exampleGrid{grid-template-columns:repeat(3,minmax(260px,1fr));gap:16px;align-items:stretch;}
+    #academic .ladder{grid-template-columns:repeat(4,minmax(210px,1fr));}
+    #academic .card.half{grid-column:span 6;}
+  }
+  @media(min-width:761px) and (max-width:1100px){
+    #academic .card.two,#academic aside.card.third,#academic .card.half{grid-column:span 12;}
+    #academic .exampleGrid{grid-template-columns:repeat(2,minmax(260px,1fr));gap:14px;}
+    #academic .exampleCard:nth-child(3){grid-column:1 / -1;}
+    #academic .ladder{grid-template-columns:repeat(2,minmax(240px,1fr));}
+  }
+  @media(max-width:760px){
+    #academic .exampleGrid{grid-template-columns:1fr;gap:12px;}
+    #academic .ladder{grid-template-columns:1fr;}
+    .formula{white-space:normal;word-break:break-word;line-height:1.45;}
+  }
+  @media(min-width:1180px){
+    .chartGrid{grid-template-columns:1.1fr .9fr;}
+    .chart{height:340px;}
+    .tiles:not([style]){grid-template-columns:repeat(3,minmax(220px,1fr));}
+  }
+  .exampleCard{display:flex;flex-direction:column;gap:6px;}
+  .exampleCard .formula{margin-top:auto;}
+  table{max-width:100%;}
+
 </style>
 </head>
 <body>
