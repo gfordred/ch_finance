@@ -1,0 +1,932 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    background: #000000;
+    color: #d8d8e0;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .terminal { max-width: 1700px; margin: 0 auto; padding: 12px; }
+
+  /* HEADER */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid #1a1a2e; padding-bottom: 14px; margin-bottom: 14px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 14px; }
+  .brand-title { font-size: 22px; font-weight: 900; color: #00ff9f; letter-spacing: 2px; }
+  .brand-sub { font-size: 12px; color: #7a7a90; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+  .status-bar { display: flex; gap: 24px; font-size: 13px; color: #8a8a9a; font-weight: 700; }
+  .status-item { display: flex; gap: 8px; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #00ff9f; box-shadow: 0 0 10px #00ff9f;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .clock { color: #00ff9f; font-weight: 900; font-size: 14px; }
+
+  /* TICKER */
+  .ticker-wrapper {
+    background: #000000;
+    border: 2px solid #1a1a2e;
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+    height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .ticker-label {
+    background: #00ff9f; color: #000000;
+    font-weight: 900; font-size: 14px;
+    padding: 12px 16px; letter-spacing: 1.5px;
+    flex-shrink: 0; height: 100%;
+    display: flex; align-items: center;
+    z-index: 2;
+    box-shadow: 6px 0 12px rgba(0, 0, 0, 0.8);
+  }
+  .ticker-track {
+    display: flex; gap: 40px;
+    white-space: nowrap;
+    animation: scroll-left 360s linear infinite;
+    padding-left: 40px;
+  }
+  .ticker-wrapper:hover .ticker-track { animation-play-state: paused; }
+  @keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 14px; color: #d8d8e0; font-weight: 600;
+    cursor: pointer; transition: color 0.15s;
+  }
+  .ticker-item:hover { color: #00ff9f; }
+  .ticker-source {
+    font-weight: 900; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .ticker-sep { color: #2a2a4e; font-size: 16px; }
+
+  /* BREAKING STRIP */
+  .breaking-strip {
+    background: linear-gradient(90deg, rgba(255, 64, 64, 0.18) 0%, rgba(255, 64, 64, 0.06) 100%);
+    border: 2px solid #ff4040;
+    overflow: hidden;
+    margin-bottom: 12px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .breaking-label {
+    background: #ff4040; color: #000000;
+    font-weight: 900; font-size: 13px;
+    padding: 10px 14px; letter-spacing: 2px;
+    flex-shrink: 0; height: 100%;
+    display: flex; align-items: center;
+    animation: blink 1.5s infinite;
+    box-shadow: 6px 0 12px rgba(0, 0, 0, 0.8);
+  }
+  @keyframes blink {
+    0%, 50% { background: #ff4040; }
+    51%, 100% { background: #aa0000; }
+  }
+  .breaking-track {
+    display: flex; gap: 50px; white-space: nowrap;
+    animation: scroll-left 180s linear infinite;
+    padding-left: 32px;
+  }
+  .breaking-strip:hover .breaking-track { animation-play-state: paused; }
+  .breaking-item {
+    display: inline-flex; gap: 10px; align-items: center;
+    font-size: 14px; color: #ffcccc; cursor: pointer; font-weight: 600;
+  }
+  .breaking-item:hover { color: #ffffff; }
+  .breaking-item .ago { color: #ff4040; font-weight: 900; font-size: 13px; }
+
+  /* CONTROLS */
+  .controls-row {
+    display: flex; gap: 8px; margin-bottom: 8px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .pub-label {
+    font-size: 13px; color: #7a7a90;
+    letter-spacing: 1.5px; min-width: 90px;
+    text-transform: uppercase; font-weight: 900;
+  }
+  .pub-label.bbc { color: #ff2929; }
+  .pub-label.bbc-sport { color: #ffaa00; }
+  .pub-label.ft { color: #fff1e0; }
+  .pub-label.bbg { color: #ffae00; }
+  .pub-label.econ { color: #ff2929; }
+  .filter-btn {
+    background: #000000; border: 1.5px solid #2a2a4a; color: #aaaabb;
+    padding: 7px 13px; font-family: inherit; font-size: 12px;
+    cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase;
+    transition: all 0.15s; font-weight: 700;
+  }
+  .filter-btn:hover { border-color: #00ff9f; color: #00ff9f; }
+  .filter-btn.active {
+    background: #00ff9f; color: #000000;
+    border-color: #00ff9f; font-weight: 900;
+  }
+  .filter-btn .count { margin-left: 8px; font-size: 11px; opacity: 0.8; font-weight: 900; }
+  .search-box {
+    flex: 1; min-width: 240px;
+    background: #000000; border: 1.5px solid #2a2a4a;
+    color: #e8e8f0; padding: 8px 14px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+  }
+  .search-box:focus { outline: none; border-color: #00ff9f; }
+  .search-box::placeholder { color: #5a5a70; font-weight: 700; }
+  .refresh-btn {
+    background: #000000; border: 1.5px solid #ff9f00; color: #ff9f00;
+    padding: 8px 14px; font-family: inherit; font-size: 12px;
+    cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
+    font-weight: 900;
+  }
+  .refresh-btn:hover { background: #ff9f00; color: #000000; }
+  .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .sort-toggle { display: flex; gap: 4px; margin-left: auto; }
+  .sort-btn, .view-btn {
+    background: #000000; border: 1.5px solid #2a2a4a; color: #7a7a90;
+    padding: 8px 12px; font-family: inherit; font-size: 12px;
+    cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase;
+    font-weight: 700;
+  }
+  .sort-btn.active, .view-btn.active { color: #00ff9f; border-color: #00ff9f; font-weight: 900; }
+  .view-toggle { display: flex; gap: 4px; }
+
+  /* HERO SECTION */
+  .hero-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .hero-card {
+    background: #000000; border: 1.5px solid #1a1a2e;
+    position: relative; overflow: hidden;
+    cursor: pointer; transition: all 0.2s;
+    min-height: 260px;
+    display: flex; flex-direction: column;
+  }
+  .hero-card:hover { border-color: #00ff9f; transform: translateY(-3px); }
+  .hero-card.featured { grid-row: span 2; min-height: 530px; }
+  .hero-image {
+    width: 100%; flex: 1;
+    background-size: cover; background-position: center;
+    background-color: #0a0a14;
+    transition: transform 0.4s;
+    position: relative;
+    min-height: 150px;
+  }
+  .hero-card:hover .hero-image { transform: scale(1.05); }
+  .hero-image::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.98) 100%);
+  }
+  .hero-overlay {
+    padding: 14px 16px;
+    background: #000000;
+    border-top: 1.5px solid #1a1a2e;
+    position: relative; z-index: 1;
+  }
+  .hero-source {
+    font-size: 12px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .hero-title {
+    font-size: 15px; color: #f0f0f8;
+    line-height: 1.4; font-weight: 700;
+    margin-bottom: 6px;
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .hero-card.featured .hero-title {
+    font-size: 22px; -webkit-line-clamp: 4; font-weight: 800;
+  }
+  .hero-time { font-size: 12px; color: #7a7a90; font-weight: 700; }
+  .hero-time.fresh { color: #00ff9f; font-weight: 900; }
+
+  /* NEWS GRID */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 10px;
+  }
+  .news-grid.compact {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .news-item {
+    background: #000000; border: 1.5px solid #1a1a2e;
+    border-left: 4px solid #1a1a2e;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; overflow: hidden;
+  }
+  .news-item:hover {
+    border-color: #3a3a5e; background: #050510;
+    transform: translateX(3px);
+  }
+  .news-item.has-image { flex-direction: column; }
+  .news-item-image {
+    width: 100%; height: 160px;
+    background-size: cover; background-position: center;
+    background-color: #0a0a14;
+    transition: transform 0.4s;
+    flex-shrink: 0;
+  }
+  .news-item:hover .news-item-image { transform: scale(1.06); }
+  .news-item-content {
+    padding: 12px 14px;
+    display: flex; flex-direction: column;
+    gap: 7px; flex: 1;
+  }
+  .news-grid.compact .news-item {
+    flex-direction: row; align-items: stretch;
+    padding: 0; min-height: 72px;
+  }
+  .news-grid.compact .news-item-image {
+    width: 96px; height: auto; min-height: 72px;
+  }
+  .news-grid.compact .news-item-content { padding: 10px 12px; gap: 5px; }
+  .news-grid.compact .news-desc { display: none; }
+
+  /* COLOR ACCENTS */
+  .news-item.bbc-world, .news-item.src-bbc-world { border-left-color: #bb1919; }
+  .news-item.bbc-business { border-left-color: #ff7a00; }
+  .news-item.bbc-arsenal { border-left-color: #ef0107; }
+  .news-item.bbc-rugby { border-left-color: #1a8754; }
+  .news-item.ft-home { border-left-color: #fff1e0; }
+  .news-item.ft-markets { border-left-color: #00b4a0; }
+  .news-item.ft-world { border-left-color: #c1a87c; }
+  .news-item.ft-companies { border-left-color: #9b59b6; }
+  .news-item.ft-global-econ { border-left-color: #e89a3c; }
+  .news-item.ft-uk { border-left-color: #cf142b; }
+  .news-item.ft-us { border-left-color: #3c5aa6; }
+  .news-item.ft-china { border-left-color: #de2910; }
+  .news-item.ft-africa { border-left-color: #ffcd00; }
+  .news-item.ft-mideast { border-left-color: #d4af37; }
+  .news-item.ft-tech { border-left-color: #5ac8fa; }
+  .news-item.ft-energy { border-left-color: #2ecc71; }
+  .news-item.ft-opinion { border-left-color: #ff6b9d; }
+  .news-item.bbg-markets { border-left-color: #f7a900; }
+  .news-item.bbg-politics { border-left-color: #ff4d4d; }
+  .news-item.bbg-technology { border-left-color: #4fc3f7; }
+  .news-item.bbg-wealth { border-left-color: #ffd700; }
+  .news-item.bbg-economics { border-left-color: #ff9933; }
+  .news-item.bbg-green { border-left-color: #66cc66; }
+  .news-item.econ-finance { border-left-color: #e3120b; }
+  .news-item.econ-business { border-left-color: #ec5b3a; }
+  .news-item.econ-intl { border-left-color: #d4527a; }
+  .news-item.econ-leaders { border-left-color: #a51c30; }
+  .news-item.econ-science { border-left-color: #8b5cf6; }
+
+  .src-bbc-world { color: #bb1919; }
+  .src-bbc-business { color: #ff7a00; }
+  .src-bbc-arsenal { color: #ef0107; }
+  .src-bbc-rugby { color: #1a8754; }
+  .src-ft-home { color: #fff1e0; }
+  .src-ft-markets { color: #00b4a0; }
+  .src-ft-world { color: #c1a87c; }
+  .src-ft-companies { color: #9b59b6; }
+  .src-ft-global-econ { color: #e89a3c; }
+  .src-ft-uk { color: #cf142b; }
+  .src-ft-us { color: #3c5aa6; }
+  .src-ft-china { color: #de2910; }
+  .src-ft-africa { color: #ffcd00; }
+  .src-ft-mideast { color: #d4af37; }
+  .src-ft-tech { color: #5ac8fa; }
+  .src-ft-energy { color: #2ecc71; }
+  .src-ft-opinion { color: #ff6b9d; }
+  .src-bbg-markets { color: #f7a900; }
+  .src-bbg-politics { color: #ff4d4d; }
+  .src-bbg-technology { color: #4fc3f7; }
+  .src-bbg-wealth { color: #ffd700; }
+  .src-bbg-economics { color: #ff9933; }
+  .src-bbg-green { color: #66cc66; }
+  .src-econ-finance { color: #e3120b; }
+  .src-econ-business { color: #ec5b3a; }
+  .src-econ-intl { color: #d4527a; }
+  .src-econ-leaders { color: #a51c30; }
+  .src-econ-science { color: #8b5cf6; }
+
+  .news-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .news-source { font-weight: 900; }
+  .news-time { color: #7a7a90; font-weight: 700; }
+  .news-time.fresh {
+    color: #00ff9f; font-weight: 900;
+    animation: fresh-glow 2s infinite;
+  }
+  @keyframes fresh-glow {
+    0%, 100% { text-shadow: 0 0 5px rgba(0, 255, 159, 0.7); }
+    50% { text-shadow: 0 0 10px rgba(0, 255, 159, 1); }
+  }
+  .news-title {
+    font-size: 15px; color: #f0f0f8;
+    line-height: 1.4; font-weight: 700;
+  }
+  .news-desc {
+    font-size: 12px; color: #9a9aaa; line-height: 1.55;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+    font-weight: 500;
+  }
+  .empty {
+    text-align: center; padding: 70px 20px;
+    color: #7a7a90; grid-column: 1 / -1;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px;
+  }
+  .loading {
+    color: #00ff9f; text-align: center;
+    padding: 50px; grid-column: 1 / -1;
+    font-size: 14px; font-weight: 900; letter-spacing: 2px;
+  }
+  .loading::after {
+    content: ''; display: inline-block;
+    width: 10px; height: 10px; margin-left: 10px;
+    border-radius: 50%; background: #00ff9f;
+    animation: pulse 1s infinite;
+  }
+  .error {
+    color: #ff4040; border: 1.5px solid #ff4040;
+    padding: 7px 12px; margin: 4px 0;
+    font-size: 11px; background: rgba(255, 64, 64, 0.08);
+    display: inline-block; margin-right: 6px;
+    font-weight: 700;
+  }
+  .errors-collapsed {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    padding: 6px 0;
+  }
+  .footer {
+    border-top: 2px solid #1a1a2e; margin-top: 20px;
+    padding-top: 14px; font-size: 11px; color: #7a7a90;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-weight: 600;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1a1a2e;
+  }
+  .section-header h2 {
+    font-size: 14px; color: #00ff9f;
+    letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 900;
+  }
+  .section-header .count-badge {
+    font-size: 12px; color: #aaaabb;
+    background: #000000; border: 1.5px solid #2a2a4a;
+    padding: 4px 10px; font-weight: 700;
+  }
+</style>
+
+<div class="terminal">
+  <div class="header">
+    <div class="brand">
+      <div class="brand-title">▮ NEWS.TERMINAL</div>
+      <div class="brand-sub">BBC × FT × BLOOMBERG × ECONOMIST × SPORT</div>
+    </div>
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        <span>LIVE</span>
+      </div>
+      <div class="status-item">
+        <span>SAST</span>
+        <span class="clock" id="clock">--:--:--</span>
+      </div>
+      <div class="status-item">
+        <span>LAST</span>
+        <span id="last-update" style="color: #c8c8d0;">--</span>
+      </div>
+      <div class="status-item">
+        <span>FEEDS</span>
+        <span id="feed-status" style="color: #00ff9f;">0/28</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREAKING NEWS STRIP -->
+  <div class="breaking-strip" id="breaking-strip" style="display: none;">
+    <div class="breaking-label">◉ BREAKING</div>
+    <div class="breaking-track" id="breaking-track"></div>
+  </div>
+
+  <!-- MAIN TICKER -->
+  <div class="ticker-wrapper">
+    <div class="ticker-label">▮ LIVE WIRE</div>
+    <div class="ticker-track" id="ticker-track">
+      <span style="color: #6b6b80; padding: 0 24px;">Loading feeds...</span>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <button class="filter-btn active" data-filter="all">All <span class="count" id="cnt-all">0</span></button>
+    <input type="text" class="search-box" id="search" placeholder="// FILTER HEADLINES..." />
+    <div class="view-toggle">
+      <button class="view-btn active" data-view="grid">▦ Grid</button>
+      <button class="view-btn" data-view="compact">≡ Compact</button>
+    </div>
+    <div class="sort-toggle">
+      <button class="sort-btn active" data-sort="time">By Time</button>
+      <button class="sort-btn" data-sort="source">By Source</button>
+    </div>
+    <button class="refresh-btn" id="refresh">↻ Refresh</button>
+  </div>
+
+  <div class="controls-row">
+    <span class="pub-label bbc">▮ BBC</span>
+    <button class="filter-btn" data-filter="bbc-world">World <span class="count" id="cnt-bbc-world">0</span></button>
+    <button class="filter-btn" data-filter="bbc-business">Business <span class="count" id="cnt-bbc-business">0</span></button>
+  </div>
+
+  <div class="controls-row">
+    <span class="pub-label bbc-sport">▮ BBC SPORT</span>
+    <button class="filter-btn" data-filter="bbc-arsenal">⚽ Arsenal <span class="count" id="cnt-bbc-arsenal">0</span></button>
+    <button class="filter-btn" data-filter="bbc-rugby">🏉 Rugby Union <span class="count" id="cnt-bbc-rugby">0</span></button>
+  </div>
+
+  <div class="controls-row">
+    <span class="pub-label ft">▮ FT</span>
+    <button class="filter-btn" data-filter="ft-home">Home <span class="count" id="cnt-ft-home">0</span></button>
+    <button class="filter-btn" data-filter="ft-markets">Markets <span class="count" id="cnt-ft-markets">0</span></button>
+    <button class="filter-btn" data-filter="ft-world">World <span class="count" id="cnt-ft-world">0</span></button>
+    <button class="filter-btn" data-filter="ft-companies">Companies <span class="count" id="cnt-ft-companies">0</span></button>
+    <button class="filter-btn" data-filter="ft-global-econ">Global Econ <span class="count" id="cnt-ft-global-econ">0</span></button>
+    <button class="filter-btn" data-filter="ft-uk">UK <span class="count" id="cnt-ft-uk">0</span></button>
+    <button class="filter-btn" data-filter="ft-us">US <span class="count" id="cnt-ft-us">0</span></button>
+    <button class="filter-btn" data-filter="ft-china">China <span class="count" id="cnt-ft-china">0</span></button>
+    <button class="filter-btn" data-filter="ft-africa">Africa <span class="count" id="cnt-ft-africa">0</span></button>
+    <button class="filter-btn" data-filter="ft-mideast">MidEast <span class="count" id="cnt-ft-mideast">0</span></button>
+    <button class="filter-btn" data-filter="ft-tech">Tech <span class="count" id="cnt-ft-tech">0</span></button>
+    <button class="filter-btn" data-filter="ft-energy">Energy <span class="count" id="cnt-ft-energy">0</span></button>
+    <button class="filter-btn" data-filter="ft-opinion">Opinion <span class="count" id="cnt-ft-opinion">0</span></button>
+  </div>
+
+  <div class="controls-row">
+    <span class="pub-label bbg">▮ BBG</span>
+    <button class="filter-btn" data-filter="bbg-markets">Markets <span class="count" id="cnt-bbg-markets">0</span></button>
+    <button class="filter-btn" data-filter="bbg-politics">Politics <span class="count" id="cnt-bbg-politics">0</span></button>
+    <button class="filter-btn" data-filter="bbg-technology">Tech <span class="count" id="cnt-bbg-technology">0</span></button>
+    <button class="filter-btn" data-filter="bbg-wealth">Wealth <span class="count" id="cnt-bbg-wealth">0</span></button>
+    <button class="filter-btn" data-filter="bbg-economics">Economics <span class="count" id="cnt-bbg-economics">0</span></button>
+    <button class="filter-btn" data-filter="bbg-green">Green <span class="count" id="cnt-bbg-green">0</span></button>
+  </div>
+
+  <div class="controls-row" style="margin-bottom: 12px;">
+    <span class="pub-label econ">▮ ECON</span>
+    <button class="filter-btn" data-filter="econ-finance">Finance <span class="count" id="cnt-econ-finance">0</span></button>
+    <button class="filter-btn" data-filter="econ-business">Business <span class="count" id="cnt-econ-business">0</span></button>
+    <button class="filter-btn" data-filter="econ-intl">Intl <span class="count" id="cnt-econ-intl">0</span></button>
+    <button class="filter-btn" data-filter="econ-leaders">Leaders <span class="count" id="cnt-econ-leaders">0</span></button>
+    <button class="filter-btn" data-filter="econ-science">Sci/Tech <span class="count" id="cnt-econ-science">0</span></button>
+  </div>
+
+  <div id="errors" class="errors-collapsed"></div>
+
+  <!-- HERO SECTION -->
+  <div id="hero-container"></div>
+
+  <!-- MAIN GRID -->
+  <div class="section-header" id="grid-header" style="display: none;">
+    <h2>▸ ALL HEADLINES</h2>
+    <span class="count-badge" id="item-count">0 items</span>
+  </div>
+  <div class="news-grid" id="grid">
+    <div class="loading">▮ FETCHING FEEDS</div>
+  </div>
+
+  <div class="footer">
+    <div>BBC © BBC. FT © The Financial Times Ltd. Bloomberg © Bloomberg L.P. The Economist © The Economist Newspaper Ltd. Headlines link to original sources.</div>
+    <div>Auto-refresh: 5min · Ticker pause on hover</div>
+  </div>
+</div>
+
+<script>
+  const FEEDS = [
+    { id: 'bbc-world',      name: 'BBC World',       publisher: 'BBC',       url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+    { id: 'bbc-business',   name: 'BBC Business',    publisher: 'BBC',       url: 'https://feeds.bbci.co.uk/news/business/rss.xml' },
+    { id: 'bbc-arsenal',    name: 'BBC Arsenal',     publisher: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/football/teams/arsenal/rss.xml' },
+    { id: 'bbc-rugby',      name: 'BBC Rugby',       publisher: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rugby-union/rss.xml' },
+    { id: 'ft-home',        name: 'FT Home',         publisher: 'FT',        url: 'https://www.ft.com/rss/home' },
+    { id: 'ft-markets',     name: 'FT Markets',      publisher: 'FT',        url: 'https://www.ft.com/markets?format=rss' },
+    { id: 'ft-world',       name: 'FT World',        publisher: 'FT',        url: 'https://www.ft.com/world?format=rss' },
+    { id: 'ft-companies',   name: 'FT Companies',    publisher: 'FT',        url: 'https://www.ft.com/companies?format=rss' },
+    { id: 'ft-global-econ', name: 'FT Global Econ',  publisher: 'FT',        url: 'https://www.ft.com/global-economy?format=rss' },
+    { id: 'ft-uk',          name: 'FT UK',           publisher: 'FT',        url: 'https://www.ft.com/world/uk?format=rss' },
+    { id: 'ft-us',          name: 'FT US',           publisher: 'FT',        url: 'https://www.ft.com/world/us?format=rss' },
+    { id: 'ft-china',       name: 'FT China',        publisher: 'FT',        url: 'https://www.ft.com/world/asia-pacific/china?format=rss' },
+    { id: 'ft-africa',      name: 'FT Africa',       publisher: 'FT',        url: 'https://www.ft.com/africa?format=rss' },
+    { id: 'ft-mideast',     name: 'FT MidEast',      publisher: 'FT',        url: 'https://www.ft.com/world/mideast?format=rss' },
+    { id: 'ft-tech',        name: 'FT Tech',         publisher: 'FT',        url: 'https://www.ft.com/companies/technology?format=rss' },
+    { id: 'ft-energy',      name: 'FT Energy',       publisher: 'FT',        url: 'https://www.ft.com/energy?format=rss' },
+    { id: 'ft-opinion',     name: 'FT Opinion',      publisher: 'FT',        url: 'https://www.ft.com/opinion?format=rss' },
+    { id: 'bbg-markets',    name: 'BBG Markets',     publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/markets' },
+    { id: 'bbg-politics',   name: 'BBG Politics',    publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/politics' },
+    { id: 'bbg-technology', name: 'BBG Tech',        publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/technology' },
+    { id: 'bbg-wealth',     name: 'BBG Wealth',      publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/wealth' },
+    { id: 'bbg-economics',  name: 'BBG Economics',   publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/economics' },
+    { id: 'bbg-green',      name: 'BBG Green',       publisher: 'Bloomberg', url: 'https://openrss.org/www.bloomberg.com/green' },
+    { id: 'econ-finance',   name: 'ECON Finance',    publisher: 'Economist', url: 'https://www.economist.com/finance-and-economics/rss.xml' },
+    { id: 'econ-business',  name: 'ECON Business',   publisher: 'Economist', url: 'https://www.economist.com/business/rss.xml' },
+    { id: 'econ-intl',      name: 'ECON Intl',       publisher: 'Economist', url: 'https://www.economist.com/international/rss.xml' },
+    { id: 'econ-leaders',   name: 'ECON Leaders',    publisher: 'Economist', url: 'https://www.economist.com/leaders/rss.xml' },
+    { id: 'econ-science',   name: 'ECON Sci/Tech',   publisher: 'Economist', url: 'https://www.economist.com/science-and-technology/rss.xml' }
+  ];
+
+  let allItems = [];
+  let currentFilter = 'all';
+  let currentSort = 'time';
+  let currentView = 'grid';
+  let searchTerm = '';
+  let successCount = 0;
+
+  // SAST clock
+  function tickClock() {
+    const now = new Date();
+    const sast = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Johannesburg' }));
+    const hh = String(sast.getHours()).padStart(2, '0');
+    const mm = String(sast.getMinutes()).padStart(2, '0');
+    const ss = String(sast.getSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  function timeAgo(date) {
+    const diff = (Date.now() - date.getTime()) / 1000;
+    if (diff < 60) return `${Math.floor(diff)}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  function isFresh(date, mins = 60) {
+    return (Date.now() - date.getTime()) < mins * 60 * 1000;
+  }
+
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  }
+
+  // Extract image from various RSS image conventions
+  function extractImage(node, descHtml) {
+    // 1. <media:content url="..." medium="image">
+    const mediaContent = node.querySelector('content[url], [*|content][url]') ||
+                         node.getElementsByTagName('media:content')[0] ||
+                         Array.from(node.getElementsByTagNameNS('*', 'content')).find(n => n.getAttribute('url'));
+    if (mediaContent?.getAttribute) {
+      const url = mediaContent.getAttribute('url');
+      if (url && /\.(jpg|jpeg|png|webp|gif)/i.test(url)) return url;
+      if (url && mediaContent.getAttribute('medium') === 'image') return url;
+      if (url && mediaContent.getAttribute('type')?.startsWith('image/')) return url;
+    }
+
+    // 2. <media:thumbnail url="...">
+    const mediaThumb = node.getElementsByTagName('media:thumbnail')[0] ||
+                       Array.from(node.getElementsByTagNameNS('*', 'thumbnail'))[0];
+    if (mediaThumb?.getAttribute) {
+      const url = mediaThumb.getAttribute('url');
+      if (url) return url;
+    }
+
+    // 3. <enclosure url="..." type="image/...">
+    const enclosure = node.querySelector('enclosure');
+    if (enclosure) {
+      const type = enclosure.getAttribute('type') || '';
+      const url = enclosure.getAttribute('url');
+      if (url && (type.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif)/i.test(url))) return url;
+    }
+
+    // 4. Image embedded in description/content HTML
+    if (descHtml) {
+      const m = descHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (m) return m[1];
+    }
+
+    // 5. <image><url>...</url></image> at item level (rare)
+    const imgEl = node.querySelector('image url, image');
+    if (imgEl?.textContent && /\.(jpg|jpeg|png|webp|gif)/i.test(imgEl.textContent)) {
+      return imgEl.textContent.trim();
+    }
+
+    return null;
+  }
+
+  function parseFeedXml(xmlString, feed) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlString, 'text/xml');
+    if (xml.querySelector('parsererror')) throw new Error('XML parse error');
+
+    let nodes = xml.querySelectorAll('item');
+    const isAtom = nodes.length === 0;
+    if (isAtom) nodes = xml.querySelectorAll('entry');
+    if (!nodes.length) throw new Error('no items in feed');
+
+    return Array.from(nodes).map(node => {
+      const title = stripHtml(node.querySelector('title')?.textContent || '');
+      let link = '';
+      if (isAtom) {
+        const linkEl = node.querySelector('link');
+        link = linkEl?.getAttribute('href') || linkEl?.textContent || '';
+      } else {
+        link = node.querySelector('link')?.textContent || '';
+      }
+      const descRaw = node.querySelector('description')?.textContent ||
+                      node.querySelector('summary')?.textContent ||
+                      node.querySelector('content')?.textContent || '';
+      const desc = stripHtml(descRaw).slice(0, 240);
+      const pubStr = node.querySelector('pubDate')?.textContent ||
+                     node.querySelector('published')?.textContent ||
+                     node.querySelector('updated')?.textContent || '';
+      const image = extractImage(node, descRaw);
+      return {
+        source: feed.id,
+        sourceName: feed.name,
+        publisher: feed.publisher,
+        title, description: desc, link, image,
+        pubDate: pubStr ? new Date(pubStr) : new Date()
+      };
+    }).filter(it => it.title && it.link);
+  }
+
+  async function fetchFeed(feed) {
+    const url = feed.url;
+    const attempts = [
+      async () => {
+        const r = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`);
+        if (!r.ok) throw new Error(`rss2json HTTP ${r.status}`);
+        const data = await r.json();
+        if (data.status !== 'ok' || !data.items) throw new Error('rss2json bad payload');
+        return data.items.map(item => {
+          // rss2json sometimes provides thumbnail or enclosure
+          let image = item.thumbnail || item.enclosure?.link || null;
+          if (!image && item.description) {
+            const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (m) image = m[1];
+          }
+          if (!image && item.content) {
+            const m = item.content.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (m) image = m[1];
+          }
+          return {
+            source: feed.id, sourceName: feed.name, publisher: feed.publisher,
+            title: stripHtml(item.title || ''),
+            description: stripHtml(item.description || item.content || '').slice(0, 240),
+            link: item.link, image,
+            pubDate: new Date(item.pubDate)
+          };
+        });
+      },
+      async () => {
+        const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+        if (!r.ok) throw new Error(`allorigins HTTP ${r.status}`);
+        const data = await r.json();
+        return parseFeedXml(data.contents, feed);
+      },
+      async () => {
+        const r = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+        if (!r.ok) throw new Error(`corsproxy.io HTTP ${r.status}`);
+        return parseFeedXml(await r.text(), feed);
+      },
+      async () => {
+        const r = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(url)}`);
+        if (!r.ok) throw new Error(`codetabs HTTP ${r.status}`);
+        return parseFeedXml(await r.text(), feed);
+      }
+    ];
+
+    let lastErr;
+    for (const attempt of attempts) {
+      try {
+        const items = await attempt();
+        if (items && items.length) return items;
+        throw new Error('empty');
+      } catch (e) { lastErr = e; }
+    }
+    throw new Error(lastErr?.message || 'all proxies failed');
+  }
+
+  async function fetchAll() {
+    const refreshBtn = document.getElementById('refresh');
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = '↻ Fetching...';
+    document.getElementById('errors').innerHTML = '';
+    successCount = 0;
+
+    const BATCH = 6;
+    const items = [];
+    const errors = [];
+
+    for (let i = 0; i < FEEDS.length; i += BATCH) {
+      const batch = FEEDS.slice(i, i + BATCH);
+      const results = await Promise.allSettled(batch.map(fetchFeed));
+      results.forEach((res, j) => {
+        if (res.status === 'fulfilled') {
+          items.push(...res.value);
+          successCount++;
+        } else {
+          errors.push(`${batch[j].name}`);
+        }
+      });
+      allItems = items.slice();
+      updateCounts();
+      updateTicker();
+      updateBreaking();
+      render();
+      document.getElementById('feed-status').textContent = `${successCount}/${FEEDS.length}`;
+    }
+
+    if (errors.length) {
+      document.getElementById('errors').innerHTML = errors.map(e => `<span class="error">⚠ ${e}</span>`).join('');
+    }
+
+    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Africa/Johannesburg' });
+    refreshBtn.disabled = false;
+    refreshBtn.textContent = '↻ Refresh';
+  }
+
+  function updateCounts() {
+    document.getElementById('cnt-all').textContent = allItems.length;
+    FEEDS.forEach(f => {
+      const c = allItems.filter(i => i.source === f.id).length;
+      const el = document.getElementById(`cnt-${f.id}`);
+      if (el) el.textContent = c;
+    });
+  }
+
+  // Ticker: top 50 latest headlines, duplicated for seamless scroll
+  function updateTicker() {
+    const track = document.getElementById('ticker-track');
+    const latest = allItems.slice().sort((a, b) => b.pubDate - a.pubDate).slice(0, 50);
+    if (!latest.length) return;
+
+    const escAttr = s => s.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const buildItem = item => `
+      <span class="ticker-item" onclick="window.open('${escAttr(item.link)}', '_blank', 'noopener')">
+        <span class="ticker-source src-${item.source}">▸ ${item.sourceName}</span>
+        <span>${escAttr(item.title)}</span>
+      </span>
+      <span class="ticker-sep">•</span>
+    `;
+    // Duplicate for seamless loop
+    track.innerHTML = latest.map(buildItem).join('') + latest.map(buildItem).join('');
+  }
+
+  function updateBreaking() {
+    const strip = document.getElementById('breaking-strip');
+    const track = document.getElementById('breaking-track');
+    const fresh = allItems.filter(i => isFresh(i.pubDate, 60))
+                          .sort((a, b) => b.pubDate - a.pubDate)
+                          .slice(0, 20);
+    if (!fresh.length) { strip.style.display = 'none'; return; }
+    strip.style.display = 'flex';
+
+    const escAttr = s => s.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const buildItem = item => `
+      <span class="breaking-item" onclick="window.open('${escAttr(item.link)}', '_blank', 'noopener')">
+        <span class="ago">${timeAgo(item.pubDate)}</span>
+        <span class="src-${item.source}" style="font-weight: 700;">${item.sourceName}</span>
+        <span>${escAttr(item.title)}</span>
+      </span>
+    `;
+    track.innerHTML = fresh.map(buildItem).join('') + fresh.map(buildItem).join('');
+  }
+
+  function renderHero(items) {
+    const c = document.getElementById('hero-container');
+    if (!items.length || currentFilter !== 'all' || searchTerm) { c.innerHTML = ''; return; }
+
+    // Pick top items WITH images
+    const withImages = items.filter(i => i.image).slice(0, 5);
+    if (withImages.length < 3) { c.innerHTML = ''; return; }
+
+    const escAttr = s => s.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const [featured, ...rest] = withImages;
+
+    const heroCardHtml = (item, isFeatured = false) => `
+      <div class="hero-card ${isFeatured ? 'featured' : ''}" onclick="window.open('${escAttr(item.link)}', '_blank', 'noopener')">
+        <div class="hero-image" style="background-image: url('${escAttr(item.image)}')"></div>
+        <div class="hero-overlay">
+          <div class="hero-source src-${item.source}">▸ ${item.sourceName}</div>
+          <div class="hero-title">${escAttr(item.title)}</div>
+          <div class="hero-time ${isFresh(item.pubDate) ? 'fresh' : ''}">${timeAgo(item.pubDate)}</div>
+        </div>
+      </div>
+    `;
+
+    c.innerHTML = `
+      <div class="section-header"><h2>▸ TOP STORIES</h2></div>
+      <div class="hero-section">
+        ${heroCardHtml(featured, true)}
+        ${rest.slice(0, 4).map(it => heroCardHtml(it)).join('')}
+      </div>
+    `;
+  }
+
+  function render() {
+    const grid = document.getElementById('grid');
+    grid.className = `news-grid ${currentView === 'compact' ? 'compact' : ''}`;
+
+    let items = allItems.slice();
+    if (currentFilter !== 'all') items = items.filter(i => i.source === currentFilter);
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      items = items.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+    }
+
+    if (currentSort === 'time') {
+      items.sort((a, b) => b.pubDate - a.pubDate);
+    } else {
+      items.sort((a, b) => a.source !== b.source ? a.source.localeCompare(b.source) : b.pubDate - a.pubDate);
+    }
+
+    document.getElementById('item-count').textContent = `${items.length} items`;
+    document.getElementById('grid-header').style.display = items.length ? 'flex' : 'none';
+
+    // Hero (only on 'all' view, time sort, no search)
+    if (currentFilter === 'all' && currentSort === 'time' && !searchTerm) {
+      renderHero(items.slice().sort((a, b) => b.pubDate - a.pubDate));
+      // Skip the hero items in main grid
+      const heroLinks = new Set(items.filter(i => i.image).slice(0, 5).map(i => i.link));
+      items = items.filter(i => !heroLinks.has(i.link));
+    } else {
+      document.getElementById('hero-container').innerHTML = '';
+    }
+
+    if (!items.length) {
+      grid.innerHTML = '<div class="empty">▮ NO HEADLINES MATCH</div>';
+      return;
+    }
+
+    const escAttr = s => s.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    grid.innerHTML = items.map(item => {
+      const fresh = isFresh(item.pubDate) ? 'fresh' : '';
+      const hasImage = item.image && currentView === 'grid';
+      const compactImage = item.image && currentView === 'compact';
+      return `
+        <div class="news-item ${item.source} ${(hasImage || compactImage) ? 'has-image' : ''}" onclick="window.open('${escAttr(item.link)}', '_blank', 'noopener')">
+          ${(hasImage || compactImage) ? `<div class="news-item-image" style="background-image: url('${escAttr(item.image)}')"></div>` : ''}
+          <div class="news-item-content">
+            <div class="news-meta">
+              <span class="news-source src-${item.source}">▸ ${item.sourceName}</span>
+              <span class="news-time ${fresh}">${timeAgo(item.pubDate)}</span>
+            </div>
+            <div class="news-title">${escAttr(item.title)}</div>
+            ${item.description && currentView === 'grid' ? `<div class="news-desc">${escAttr(item.description)}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Wire up controls
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSort = btn.dataset.sort;
+      render();
+    });
+  });
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      render();
+    });
+  });
+  document.getElementById('search').addEventListener('input', e => { searchTerm = e.target.value; render(); });
+  document.getElementById('refresh').addEventListener('click', fetchAll);
+
+  setInterval(fetchAll, 5 * 60 * 1000);
+  // Re-render every 60s so timestamps update
+  setInterval(() => { updateBreaking(); render(); }, 60000);
+  fetchAll();
+</script>
